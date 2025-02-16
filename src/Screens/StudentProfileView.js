@@ -141,6 +141,7 @@ export const StudentProfileView = ({ route, navigation }) => {
     },
     attendance: {
       currentSemester: {
+        overallAttendance: 90.5,
         courses: [
           {
             code: "SE301",
@@ -148,24 +149,24 @@ export const StudentProfileView = ({ route, navigation }) => {
             creditHours: 3,
             totalClasses: 44,
             attendedClasses: 40,
-            percentage: 90.91
+            percentage: 90.91, // This field is named "percentage"
           },
           {
-            code: "CS302",
-            name: "Web Engineering",
+            code: "SE301",
+            name: "Software Design & Architecture",
             creditHours: 3,
             totalClasses: 44,
-            attendedClasses: 38,
-            percentage: 86.36
+            attendedClasses: 40,
+            percentage: 90.91, // This field is named "percentage"
           },
           {
-            code: "SE302",
-            name: "Software Quality Engineering",
+            code: "SE301",
+            name: "Software Design & Architecture",
             creditHours: 3,
             totalClasses: 44,
-            attendedClasses: 42,
-            percentage: 95.45
-          }
+            attendedClasses: 40,
+            percentage: 90.91, // This field is named "percentage"
+          },
         ]
       }
     }
@@ -202,7 +203,9 @@ export const StudentProfileView = ({ route, navigation }) => {
   };
 
   const handleEditAttendance = () => {
-    navigation.navigate('EditStudentAttendance', { studentData: studentData.attendance });
+    navigation.navigate('EditStudentAttendance', { 
+      studentData: studentData.attendance // Pass the attendance data
+    });
   };
   const getAttendanceColor = (percentage) => {
     if (percentage >= 90) return '#10B981';

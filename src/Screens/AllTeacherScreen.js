@@ -62,7 +62,7 @@ const AllTeachersScreen = ({ navigation }) => {
 
   const handleAddNew = () => {
     // Navigate to add new teacher screen
-    navigation.navigate('AddTeacher');
+    navigation.navigate('CreateTeacherForm');
   };
 
 

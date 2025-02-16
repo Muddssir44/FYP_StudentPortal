@@ -15,7 +15,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const AnimatedRing = ({ percentage, color, size = 80 }) => {
   const animatedValue = React.useRef(new Animated.Value(0)).current;
-  const radius = size * 0.4; // Making the ring proportional to container size
+  const radius = size * 0.4; 
   const strokeWidth = size * 0.1;
 
   React.useEffect(() => {
