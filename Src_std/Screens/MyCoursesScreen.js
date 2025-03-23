@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
     ScrollView,
     Animated,
     TouchableOpacity,
-    FlatList,
     Dimensions,
     StyleSheet
 } from 'react-native';
-import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
-import CircularProgress from '../Components/CircularProgress';
+import SemesterHeader from '../Components/SemesterHeader';
+import CurrentCourseCard from '../Components/CurrentCourseCard';
+import PreviousCourseCard from '../Components/PreviousCourseCard';
+
 
 // Mock data structure for student courses
 const studentCoursesData = {
@@ -409,215 +410,6 @@ const studentCoursesData = {
     ]
 };
 
-// Current Course Card Component with Schedule
-const CurrentCourseCard = ({ course, onPress }) => {
-    const [expanded, setExpanded] = useState(false);
-    const rotateAnim = useState(new Animated.Value(0))[0];
-    const heightAnim = useState(new Animated.Value(0))[0];
-
-    useEffect(() => {
-        Animated.parallel([
-            Animated.spring(rotateAnim, {
-                toValue: expanded ? 1 : 0,
-                useNativeDriver: true
-            }),
-            Animated.spring(heightAnim, {
-                toValue: expanded ? 1 : 0,
-                useNativeDriver: false
-            })
-        ]).start();
-    }, [expanded]);
-
-    const rotate = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '180deg']
-    });
-
-    return (
-        <Animated.View style={styles.currentCourseCard}>
-            <TouchableOpacity
-                style={styles.cardHeader}
-                onPress={() => setExpanded(!expanded)}
-            >
-                <View style={styles.courseBasicInfo}>
-                    <View style={styles.codeContainer}>
-                        <Text style={styles.courseCode}>{course.code}</Text>
-                        {course.type.includes('Lab') && (
-                            <View style={styles.labBadge}>
-                                <FontAwesome5 name="flask" size={12} color="#6C63FF" />
-                                <Text style={styles.labText}>+Lab</Text>
-                            </View>
-                        )}
-                    </View>
-                    <Text style={styles.courseName}>{course.name}</Text>
-                    <View style={styles.instructorContainer}>
-                        <FontAwesome5 name="chalkboard-teacher" size={14} color="#6B7280" />
-                        <Text style={styles.instructorName}>{course.instructor}</Text>
-                    </View>
-                </View>
-
-                <View style={styles.rightContent}>
-                    <CircularProgress
-                        value={course.progress}
-                        size={48}  
-                        strokeWidth={4}
-                        duration={1000}  
-                        label={course.label} 
-                        scale={1}  
-                        color="#6C63FF"
-                    />
-
-                    <Animated.View style={{ transform: [{ rotate }] }}>
-                        <MaterialIcons
-                            name="keyboard-arrow-down"
-                            size={24}
-                            color="#6B7280"
-                        />
-                    </Animated.View>
-                </View>
-            </TouchableOpacity>
-
-            <Animated.View style={[
-                styles.scheduleContainer,
-                {
-                    maxHeight: heightAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, 300]
-                    }),
-                    opacity: heightAnim
-                }
-            ]}>
-                <View style={styles.scheduleSection}>
-                    <Text style={styles.scheduleTitle}>Theory Classes</Text>
-                    <View style={styles.scheduleDetails}>
-                        <View style={styles.scheduleItem}>
-                            <FontAwesome5 name="calendar-alt" size={14} color="#6C63FF" />
-                            <Text style={styles.scheduleText}>
-                                {course.schedule.theory.days.join(', ')}
-                            </Text>
-                        </View>
-                        <View style={styles.scheduleItem}>
-                            <FontAwesome5 name="clock" size={14} color="#6C63FF" />
-                            <Text style={styles.scheduleText}>
-                                {course.schedule.theory.time}
-                            </Text>
-                        </View>
-                        <View style={styles.scheduleItem}>
-                            <FontAwesome5 name="door-open" size={14} color="#6C63FF" />
-                            <Text style={styles.scheduleText}>
-                                {course.schedule.theory.room}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-
-                {course.schedule.lab && (
-                    <View style={styles.scheduleSection}>
-                        <Text style={styles.scheduleTitle}>Lab Sessions</Text>
-                        <View style={styles.scheduleDetails}>
-                            <View style={styles.scheduleItem}>
-                                <FontAwesome5 name="calendar-alt" size={14} color="#6C63FF" />
-                                <Text style={styles.scheduleText}>
-                                    {course.schedule.lab.day}
-                                </Text>
-                            </View>
-                            <View style={styles.scheduleItem}>
-                                <FontAwesome5 name="clock" size={14} color="#6C63FF" />
-                                <Text style={styles.scheduleText}>
-                                    {course.schedule.lab.time}
-                                </Text>
-                            </View>
-                            <View style={styles.scheduleItem}>
-                                <FontAwesome5 name="flask" size={14} color="#6C63FF" />
-                                <Text style={styles.scheduleText}>
-                                    {course.schedule.lab.room}
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-                )}
-            </Animated.View>
-        </Animated.View>
-    );
-};
-
-// Previous Semester Course Card
-const PreviousCourseCard = ({ course }) => {
-    const scaleAnim = useState(new Animated.Value(0.95))[0];
-
-    useEffect(() => {
-        Animated.spring(scaleAnim, {
-            toValue: 1,
-            tension: 50,
-            friction: 7,
-            useNativeDriver: true
-        }).start();
-    }, []);
-
-    return (
-        <Animated.View style={[
-            styles.previousCourseCard,
-            { transform: [{ scale: scaleAnim }] }
-        ]}>
-            <View style={styles.previousCourseHeader}>
-                <Text style={styles.courseCode}>{course.code}</Text>
-                <View style={[
-                    styles.gradeBadge,
-                    { backgroundColor: course.grade === 'A' ? '#DCFCE7' : '#FEF9C3' }
-                ]}>
-                    <Text style={[
-                        styles.gradeText,
-                        { color: course.grade === 'A' ? '#22C55E' : '#CA8A04' }
-                    ]}>
-                        Grade: {course.grade}
-                    </Text>
-                </View>
-            </View>
-            <Text style={styles.courseName}>{course.name}</Text>
-            <View style={styles.courseDetails}>
-                <View style={styles.detailItem}>
-                    <FontAwesome5 name="user-tie" size={14} color="#6B7280" />
-                    <Text style={styles.detailText}>{course.instructor}</Text>
-                </View>
-                <View style={styles.detailItem}>
-                    <FontAwesome5 name="graduation-cap" size={14} color="#6B7280" />
-                    <Text style={styles.detailText}>{course.creditHours} Credit Hours</Text>
-                </View>
-            </View>
-        </Animated.View>
-    );
-};
-
-// Semester Section Header
-const SemesterHeader = ({ semester }) => {
-    return (
-        <View style={styles.semesterHeader}>
-            <View style={styles.semesterInfo}>
-                <Text style={styles.semesterTitle}>
-                    Semester {semester.number}
-                </Text>
-                {semester.completed && (
-                    <View style={styles.gpaContainer}>
-                        <Text style={styles.gpaLabel}>GPA</Text>
-                        <Text style={styles.gpaValue}>{semester.gpa.toFixed(2)}</Text>
-                    </View>
-                )}
-            </View>
-            <View style={styles.semesterProgress}>
-                <View style={styles.progressLine}>
-                    <View style={[
-                        styles.progressFill,
-                        { width: semester.completed ? '100%' : '0%' }
-                    ]} />
-                </View>
-                <Text style={styles.progressText}>
-                    {semester.completed ? 'Completed' : 'In Progress'}
-                </Text>
-            </View>
-        </View>
-    );
-};
-
 // Main Courses Screen
 const MyCoursesScreen = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState('current');
@@ -713,7 +505,7 @@ const MyCoursesScreen = ({ navigation }) => {
     );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',

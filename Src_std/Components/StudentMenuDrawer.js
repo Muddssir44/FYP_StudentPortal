@@ -88,7 +88,7 @@ const StudentMenuDrawer = ({ isVisible, onClose, navigation }) => {
       id: 'events',
       title: 'Events',
       icon: 'event',
-      screen: 'Events',
+      screen: 'EventsScreen',
       color: '#7C3AED'
     }
   ];

@@ -5,18 +5,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
-  Alert,
   StyleSheet
 } from 'react-native';
-import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import {  FontAwesome5 } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import CircularProgress from '../Components/CircularProgress';
-import StudentCourseCard from '../Components/StudentCourseCard';
-import StudentRegistrationStatusCard from '../Components/StudentRegistrationStatusCard';
-import StudentRegistrationSuccessScreen from './StudentRegistrationSuccessScreen';
-import StudentSemesterRegistrationScreen from './StudentSemesterRegistrationScreen';
 import ConfettiCannon from 'react-native-confetti-cannon';
+
 
 const StudentRegistrationConfirmationScreen = ({ route, navigation }) => {
   const { selectedCourses, registrationData } = route.params || {};

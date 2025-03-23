@@ -26,209 +26,16 @@ import {
     BookmarkPlus,
     ChevronRight,
     Building2,
-    Tag
+    Tag,
+    searchTimeout,
+    current
 } from 'lucide-react-native';
+import InternshipCard from '../Components/InternshipCard';
+import QuickFilters from '../Components/QuickFilters';
+import StatusBadge from '../Components/StatusBadge';
+import SpringFadeIn from '../Components/SpringFadeIn';
 
-// Enhanced animation component with spring effect
-const SpringFadeIn = ({ children, delay = 0, duration = 500 }) => {
-    const springAnim = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(50)).current;
 
-    useEffect(() => {
-        Animated.parallel([
-            Animated.spring(springAnim, {
-                toValue: 1,
-                tension: 20,
-                friction: 7,
-                delay,
-                useNativeDriver: true,
-            }),
-            Animated.spring(translateY, {
-                toValue: 0,
-                tension: 30,
-                friction: 7,
-                delay,
-                useNativeDriver: true,
-            })
-        ]).start();
-    }, [delay]);
-
-    return (
-        <Animated.View style={{
-            opacity: springAnim,
-            transform: [{ translateY }]
-        }}>
-            {children}
-        </Animated.View>
-    );
-};
-
-// Status Badge Component
-const StatusBadge = ({ status }) => {
-    const getStatusStyle = () => {
-        switch (status.toLowerCase()) {
-            case 'active':
-                return styles.statusActive;
-            case 'upcoming':
-                return styles.statusUpcoming;
-            default:
-                return styles.statusDefault;
-        }
-    };
-
-    return (
-        <View style={[styles.statusBadge, getStatusStyle()]}>
-            <View style={[styles.statusDot, getStatusStyle()]} />
-            <Text style={styles.statusText}>{status}</Text>
-        </View>
-    );
-};
-
-// Quick Filters Component with Horizontal Scroll
-const QuickFilters = ({ onFilterChange, activeFilter }) => {
-    const filters = [
-        { id: 'all', label: 'All Internships', icon: Briefcase },
-        { id: 'fulltime', label: 'Full-time', icon: Clock },
-        { id: 'remote', label: 'Remote', icon: MapPin },
-        { id: 'active', label: 'Active', icon: Calendar }
-    ];
-
-    return (
-        <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.quickFiltersContainer}
-        >
-            {filters.map((filter) => {
-                const Icon = filter.icon;
-                const isActive = activeFilter === filter.id;
-
-                return (
-                    <TouchableOpacity
-                        key={filter.id}
-                        onPress={() => onFilterChange(filter.id)}
-                        style={[
-                            styles.filterChip,
-                            isActive && styles.filterChipActive
-                        ]}
-                    >
-                        <Icon
-                            size={16}
-                            color={isActive ? '#FFFFFF' : '#6B7280'}
-                            style={styles.filterIcon}
-                        />
-                        <Text style={[
-                            styles.filterLabel,
-                            isActive && styles.filterLabelActive
-                        ]}>
-                            {filter.label}
-                        </Text>
-                    </TouchableOpacity>
-                );
-            })}
-        </ScrollView>
-    );
-};
-
-// Internship Card Component
-const InternshipCard = ({ item, onPress, onSave, index }) => {
-    const [isSaved, setIsSaved] = useState(false);
-    const scaleAnim = useRef(new Animated.Value(1)).current;
-
-    const handlePress = () => {
-        Animated.sequence([
-            Animated.timing(scaleAnim, {
-                toValue: 0.95,
-                duration: 100,
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: 100,
-                useNativeDriver: true,
-            })
-        ]).start(() => onPress(item));
-    };
-
-    return (
-        <SpringFadeIn delay={index * 100}>
-            <Animated.View style={[
-                styles.cardContainer,
-                { transform: [{ scale: scaleAnim }] }
-            ]}>
-                <TouchableOpacity
-                    onPress={handlePress}
-                    activeOpacity={0.9}
-                    style={styles.card}
-                >
-                    <View style={styles.cardHeader}>
-                        <View style={styles.companyBadge}>
-                            <Text style={styles.companyInitials}>
-                                {item.company.split(' ').map(word => word[0]).join('')}
-                            </Text>
-                        </View>
-                        <View style={styles.headerInfo}>
-                            <Text style={styles.companyName}>{item.company}</Text>
-                            <StatusBadge status={item.status} />
-                        </View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setIsSaved(!isSaved);
-                                onSave(item);
-                            }}
-                            style={styles.saveButton}
-                        >
-                            <BookmarkPlus
-                                size={20}
-                                color={isSaved ? '#6C63FF' : '#6B7280'}
-                            />
-                        </TouchableOpacity>
-                    </View>
-
-                    <Text style={styles.jobTitle}>{item.title}</Text>
-
-                    <View style={styles.detailsGrid}>
-                        <View style={styles.detailItem}>
-                            <MapPin size={16} color="#6B7280" />
-                            <Text style={styles.detailText}>{item.location}</Text>
-                        </View>
-                        <View style={styles.detailItem}>
-                            <Clock size={16} color="#6B7280" />
-                            <Text style={styles.detailText}>{item.duration}</Text>
-                        </View>
-                        <View style={styles.detailItem}>
-                            <DollarSign size={16} color="#6B7280" />
-                            <Text style={styles.detailText}>{item.stipend}</Text>
-                        </View>
-                        <View style={styles.detailItem}>
-                            <Users size={16} color="#6B7280" />
-                            <Text style={styles.detailText}>{item.positions} positions</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.skillsContainer}>
-                        {item.requirements.split(', ').map((skill, index) => (
-                            <View key={index} style={styles.skillChip}>
-                                <Tag size={12} color="#6C63FF" />
-                                <Text style={styles.skillText}>{skill}</Text>
-                            </View>
-                        ))}
-                    </View>
-
-                    <View style={styles.cardFooter}>
-                        <View style={styles.deadline}>
-                            <Calendar size={14} color="#EF4444" />
-                            <Text style={styles.deadlineText}>
-                                Apply by {item.deadline}
-                            </Text>
-                        </View>
-                        <Text style={styles.postedDate}>{item.postedDate}</Text>
-                    </View>
-                </TouchableOpacity>
-            </Animated.View>
-        </SpringFadeIn>
-    );
-};
 
 // Main Internship Screen
 const StudentInternshipScreen = ({ navigation }) => {
@@ -242,6 +49,8 @@ const StudentInternshipScreen = ({ navigation }) => {
     const [showFilters, setShowFilters] = useState(false);
     const filterSheetAnim = useRef(new Animated.Value(0)).current;
     const searchInputRef = useRef(null);
+    const searchTimeout = useRef(null); 
+
     const internships = [
         {
             id: 1,
@@ -287,13 +96,19 @@ const StudentInternshipScreen = ({ navigation }) => {
         }
     ];
     const handleSearch = (query) => {
+        // Debouncing the search to prevent UI lag
+
+        
         setSearchQuery(query);
-        const filtered = internships.filter(item =>
-            item.title.toLowerCase().includes(query.toLowerCase()) ||
-            item.company.toLowerCase().includes(query.toLowerCase()) ||
-            item.requirements.toLowerCase().includes(query.toLowerCase())
-        );
-        setFilteredInternships(filtered);
+        
+        searchTimeout.current = setTimeout(() => {
+            const filtered = internships.filter(item =>
+                item.title.toLowerCase().includes(query.toLowerCase()) ||
+                item.company.toLowerCase().includes(query.toLowerCase()) ||
+                item.requirements.toLowerCase().includes(query.toLowerCase())
+            );
+            setFilteredInternships(filtered);
+        }, 300); // 300ms delay for smoother experience
     };
 
     const handleFilterChange = (filterType) => {
@@ -335,67 +150,74 @@ const StudentInternshipScreen = ({ navigation }) => {
     };
 
     // Advanced Filter Sheet Component
-    const FilterSheet = () => {
-        const translateY = filterSheetAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [600, 0],
-        });
+// Updated FilterSheet component to fix blinking issues
+const FilterSheet = () => {
+    const translateY = filterSheetAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [600, 0],
+    });
 
-        return (
-            <Animated.View
-                style={[
-                    styles.filterSheet,
-                    { transform: [{ translateY }] }
-                ]}
-            >
-                <View style={styles.filterSheetHeader}>
-                    <Text style={styles.filterSheetTitle}>Advanced Filters</Text>
+    // Use useNativeDriver with opacity and transform for better performance
+    return (
+        <Animated.View
+            style={[
+                styles.filterSheet,
+                { 
+                    transform: [{ translateY }],
+                    // Adding opacity for smoother transitions
+                    opacity: filterSheetAnim
+                }
+            ]}
+        >
+            {/* Rest of component remains the same */}
+            <View style={styles.filterSheetHeader}>
+                <Text style={styles.filterSheetTitle}>Advanced Filters</Text>
+                <TouchableOpacity
+                    onPress={toggleFilterSheet}
+                    style={styles.closeButton}
+                >
+                    <Text style={styles.closeButtonText}>×</Text>
+                </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.filterContent}>
+                <FilterSection
+                    title="Internship Type"
+                    options={['Full-time', 'Part-time', 'Remote']}
+                />
+                <FilterSection
+                    title="Duration"
+                    options={['1-3 months', '3-6 months', '6+ months']}
+                />
+                <FilterSection
+                    title="Stipend Range"
+                    options={['$0-1000', '$1000-2000', '$2000+']}
+                />
+
+                <View style={styles.filterActions}>
                     <TouchableOpacity
-                        onPress={toggleFilterSheet}
-                        style={styles.closeButton}
+                        style={styles.resetButton}
+                        onPress={() => {
+                            // Reset filters logic
+                            toggleFilterSheet();
+                        }}
                     >
-                        <Text style={styles.closeButtonText}>×</Text>
+                        <Text style={styles.resetButtonText}>Reset</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.applyButton}
+                        onPress={() => {
+                            // Apply filters logic
+                            toggleFilterSheet();
+                        }}
+                    >
+                        <Text style={styles.applyButtonText}>Apply Filters</Text>
                     </TouchableOpacity>
                 </View>
-
-                <ScrollView style={styles.filterContent}>
-                    <FilterSection
-                        title="Internship Type"
-                        options={['Full-time', 'Part-time', 'Remote']}
-                    />
-                    <FilterSection
-                        title="Duration"
-                        options={['1-3 months', '3-6 months', '6+ months']}
-                    />
-                    <FilterSection
-                        title="Stipend Range"
-                        options={['$0-1000', '$1000-2000', '$2000+']}
-                    />
-
-                    <View style={styles.filterActions}>
-                        <TouchableOpacity
-                            style={styles.resetButton}
-                            onPress={() => {
-                                // Reset filters logic
-                                toggleFilterSheet();
-                            }}
-                        >
-                            <Text style={styles.resetButtonText}>Reset</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.applyButton}
-                            onPress={() => {
-                                // Apply filters logic
-                                toggleFilterSheet();
-                            }}
-                        >
-                            <Text style={styles.applyButtonText}>Apply Filters</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
-            </Animated.View>
-        );
-    };
+            </ScrollView>
+        </Animated.View>
+    );
+};
 
     // Filter Section Component for Filter Sheet
     const FilterSection = ({ title, options }) => (
@@ -426,7 +248,6 @@ const StudentInternshipScreen = ({ navigation }) => {
                 <FlatList
                     ListHeaderComponent={() => (
                         <View>
-                            <SpringFadeIn delay={100}>
                                 <View style={styles.searchBar}>
                                     <Search size={20} color="#666" style={styles.searchIcon} />
                                     <TextInput
@@ -459,7 +280,6 @@ const StudentInternshipScreen = ({ navigation }) => {
                                         <ChevronRight size={16} color="#6B7280" />
                                     </TouchableOpacity>
                                 </View>
-                            </SpringFadeIn>
                         </View>
                     )}
                     data={filteredInternships}
@@ -468,7 +288,7 @@ const StudentInternshipScreen = ({ navigation }) => {
                         <InternshipCard
                             item={item}
                             onPress={(internship) => {
-                                navigation.navigate('InternshipDetail', { internship });
+                                navigation.navigate('InternshipDetailScreen', { internship });
                             }}
                             onSave={handleSaveInternship}
                             index={index}
@@ -498,114 +318,7 @@ const StudentInternshipScreen = ({ navigation }) => {
         </View>
     );
 };
-const InternshipDetailScreen = ({ route, navigation }) => {
-    const { internship } = route.params;
-
-    return (
-        <View style={styles.container}>
-            <Header />
-            <ScrollView>
-                <View style={styles.detailContent}>
-                    <CompanyHeader company={internship.company} />
-                    <InternshipOverview internship={internship} />
-                    <JobDescription internship={internship} />
-                    <RequirementsSection internship={internship} />
-                    <BenefitsSection internship={internship} />
-
-                    <View style={styles.actionButtons}>
-                        <TouchableOpacity
-                            style={styles.saveButton}
-                            onPress={() => handleSaveInternship(internship)}
-                        >
-                            <BookmarkPlus size={20} color="#6C63FF" />
-                            <Text style={styles.saveButtonText}>Save</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.applyButton}
-                            onPress={() => navigation.navigate('ApplicationForm', { internship })}
-                        >
-                            <Text style={styles.applyButtonText}>Quick Apply</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </ScrollView>
-        </View>
-    );
-};
-
-// Application Form Screen:
-const InternshipApplicationScreen = ({ route, navigation }) => {
-    const { internship } = route.params;
-    const [formData, setFormData] = useState({
-        resumeUrl: '',
-        coverLetter: '',
-        portfolioUrl: '',
-        availability: '',
-    });
-
-    const handleSubmit = async () => {
-        try {
-            // Submit application logic here
-            navigation.navigate('ApplicationSuccess', {
-                internship,
-                applicationId: 'some-id'
-            });
-        } catch (error) {
-            // Handle error
-        }
-    };
-
-    return (
-        <View style={styles.container}>
-            <Header />
-            <ScrollView>
-                <View style={styles.formContent}>
-                    <ApplicationForm
-                        formData={formData}
-                        setFormData={setFormData}
-                        onSubmit={handleSubmit}
-                    />
-                </View>
-            </ScrollView>
-        </View>
-    );
-};
-
-// Application Success Screen:
-const ApplicationSuccessScreen = ({ route, navigation }) => {
-    const { internship, applicationId } = route.params;
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.successContent}>
-                <SuccessAnimation />
-                <Text style={styles.successTitle}>Application Submitted!</Text>
-                <Text style={styles.successMessage}>
-                    Your application for {internship.title} at {internship.company} has been submitted successfully.
-                </Text>
-                <View style={styles.successActions}>
-                    <TouchableOpacity
-                        style={styles.viewApplicationButton}
-                        onPress={() => navigation.navigate('MyApplications')}
-                    >
-                        <Text style={styles.viewApplicationText}>View My Applications</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => navigation.navigate('InternshipList')}
-                    >
-                        <Text style={styles.backButtonText}>Back to Internships</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
-    );
-};
-
-
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8F9FA',
@@ -764,6 +477,396 @@ const styles = StyleSheet.create({
     },
     statusDefault: {
         backgroundColor: '#F3F4F6',
+    },
+    // Additional styles for new components
+    // Company Header Styles
+    companyHeaderContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 24,
+        backgroundColor: 'white',
+        borderRadius: 16,
+        marginBottom: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    companyLogoContainer: {
+        width: 64,
+        height: 64,
+        borderRadius: 12,
+        backgroundColor: '#F3F4F6',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 16,
+    },
+    companyLogoText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#6C63FF',
+    },
+    companyInfoContainer: {
+        flex: 1,
+    },
+    companyHeaderName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1F2937',
+        marginBottom: 8,
+    },
+    companyStats: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    statItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 16,
+    },
+    statText: {
+        fontSize: 14,
+        color: '#6B7280',
+        marginLeft: 6,
+    },
+    
+    // Internship Overview Styles
+    overviewContainer: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    overviewTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#111827',
+        marginBottom: 12,
+    },
+    keyDetailsContainer: {
+        marginTop: 16,
+    },
+    keyDetailItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    keyDetailText: {
+        fontSize: 16,
+        color: '#4B5563',
+        marginLeft: 12,
+    },
+    deadlineHighlight: {
+        color: '#EF4444',
+        fontWeight: '500',
+    },
+    
+    // Section Container Styles
+    sectionContainer: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#111827',
+        marginBottom: 16,
+    },
+    descriptionText: {
+        fontSize: 16,
+        lineHeight: 24,
+        color: '#4B5563',
+    },
+    
+    // Requirements/Benefits List Styles
+    requirementsList: {
+        marginTop: 8,
+    },
+    requirementItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 12,
+    },
+    bulletPoint: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#6C63FF',
+        marginTop: 6,
+        marginRight: 12,
+    },
+    requirementText: {
+        flex: 1,
+        fontSize: 16,
+        color: '#4B5563',
+    },
+    benefitsList: {
+        marginTop: 8,
+    },
+    benefitItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 12,
+    },
+    benefitText: {
+        flex: 1,
+        fontSize: 16,
+        color: '#4B5563',
+    },
+    
+    // Action Buttons
+    actionButtons: {
+        flexDirection: 'row',
+        marginBottom: 24,
+    },
+    saveButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#6C63FF',
+        marginRight: 12,
+        flex: 1,
+    },
+    saveButtonText: {
+        marginLeft: 8,
+        color: '#6C63FF',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    applyButton: {
+        flex: 1,
+        backgroundColor: '#6C63FF',
+        borderRadius: 8,
+        padding: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    applyButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    
+    // Application Form Styles
+    formContent: {
+        padding: 16,
+    },
+    applicationForm: {
+        borderRadius: 16,
+        backgroundColor: 'white',
+        padding: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    stepIndicator: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 24,
+    },
+    stepDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#E5E7EB',
+        marginHorizontal: 4,
+    },
+    activeStepDot: {
+        backgroundColor: '#6C63FF',
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+    },
+    completedStepDot: {
+        backgroundColor: '#A5B4FC',
+    },
+    formStep: {
+        marginBottom: 16,
+    },
+    formStepTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#111827',
+        marginBottom: 20,
+    },
+    formField: {
+        marginBottom: 20,
+    },
+    fieldLabel: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#4B5563',
+        marginBottom: 8,
+    },
+    textInput: {
+        backgroundColor: '#F9FAFB',
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 8,
+        padding: 12,
+        fontSize: 16,
+        color: '#1F2937',
+    },
+    textArea: {
+        height: 120,
+        textAlignVertical: 'top',
+    },
+    uploadContainer: {
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 8,
+        padding: 16,
+        borderStyle: 'dashed',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    uploadButton: {
+        backgroundColor: '#EEF2FF',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        marginBottom: 8,
+    },
+    uploadButtonText: {
+        color: '#6C63FF',
+        fontWeight: '500',
+    },
+    uploadHelp: {
+        fontSize: 14,
+        color: '#6B7280',
+    },
+    stepNavigation: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 16,
+    },
+    nextButton: {
+        backgroundColor: '#6C63FF',
+        borderRadius: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        marginLeft: 8,
+    },
+    nextButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    backButton: {
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        marginRight: 8,
+    },
+    backButtonText: {
+        color: '#6B7280',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    submitButton: {
+        backgroundColor: '#10B981',
+        borderRadius: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        marginLeft: 8,
+    },
+    submitButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    
+    // Success Screen Styles
+    successContent: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        backgroundColor: 'white',
+    },
+    successTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#111827',
+        marginBottom: 16,
+    },
+    successMessage: {
+        fontSize: 16,
+        color: '#4B5563',
+        textAlign: 'center',
+        marginBottom: 32,
+    },
+    successActions: {
+        width: '100%',
+    },
+    viewApplicationButton: {
+        backgroundColor: '#6C63FF',
+        borderRadius: 8,
+        paddingVertical: 14,
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    viewApplicationText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    detailContent: {
+        padding: 16,
     },
     statusDot: {
         width: 6,

@@ -40,7 +40,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import { ExamScheduleDetailsScreen } from './src/Screens/ExamScheduleDetailsScreen ';
 // import { ExamScheduleDepartmentScreen } from './src/Screens/ExamScheduleDepartmentScreen';
 // import CreateSemesterRegistration from './src/Screens/CreateSemesterRegistration';
-import { SemesterReg_DepartmentListScreen } from './src/Screens/SemesterReg_DepartmentListScreen';
 // import { SemesterDetailsScreen } from './src/Screens/SemesterDetailsScreen';
 // import { EditSemesterRegistration } from './src/Screens/EditSemesterRegistration';
 // import { SemesterListScreen } from './src/Screens/SemesterListScreen';
@@ -61,9 +60,10 @@ import StudentExamScheduleScreen from './Src_std/Screens/StudentExamScheduleScre
 import StudentNewsScreen from './Src_std/Screens/StudentNewsScreen';
 import StudentDashboardScreen from './Src_std/Screens/StudentDashboardScreen';
 import StudentInternshipScreen from './Src_std/Screens/StudentInternshipScreen';
-
-
-
+import InternshipDetailScreen from './Src_std/Screens/InternshipDetailScreen';
+import InternshipApplicationScreen from './Src_std/Screens/InternshipApplicationScreen';
+import ApplicationSuccessScreen from './Src_std/Screens/ApplicationSuccessScreen';
+import EventsScreen from './Src_std/Screens/EventsScreen';
 
 const Stack = createNativeStackNavigator();
 function App() {
@@ -172,9 +172,17 @@ function App() {
 
 
         <Stack.Screen name="StudentNewsScreen" component={StudentNewsScreen} />
+
+
+
+        
         <Stack.Screen name="StudentInternshipScreen" component={StudentInternshipScreen} />
+        <Stack.Screen name="InternshipDetailScreen" component={InternshipDetailScreen} />
+        <Stack.Screen name="InternshipApplicationScreen" component={InternshipApplicationScreen} />
+        <Stack.Screen name="ApplicationSuccessScreen" component={ApplicationSuccessScreen} />
+        <Stack.Screen name="EventsScreen" component={EventsScreen} />
 
-
+        
         
         
 

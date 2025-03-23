@@ -2,16 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
-    ScrollView,
     TouchableOpacity,
     Animated,
-    Alert,
     StyleSheet
 } from 'react-native';
-import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
-import { CustomHeader } from '../Components/CustomHeader';
-import StudentCourseCard from '../Components/StudentCourseCard';
+
 
 const StudentRegistrationSuccessScreen = ({ route, navigation }) => {
     const { courseCount, creditHours } = route.params;

@@ -1,192 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
     View,
     Text,
     FlatList,
     TextInput,
-    Animated,
-    TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
     Platform,
-    Dimensions
 } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
     Search,
-    Calendar,
-    Tag,
-    ChevronRight,
-    BookOpen,
-    Bell,
-    Filter,
-    Clock
+
 } from 'lucide-react-native';
-
-// Enhanced FadeInView with useRef
-const FadeInView = ({ children, delay = 0, duration = 500 }) => {
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(50)).current;
-
-    useEffect(() => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: duration,
-                delay: delay,
-                useNativeDriver: true,
-            }),
-            Animated.timing(translateY, {
-                toValue: 0,
-                duration: duration,
-                delay: delay,
-                useNativeDriver: true,
-            })
-        ]).start();
-    }, [delay, duration]);
-
-    return (
-        <Animated.View style={{
-            opacity: fadeAnim,
-            transform: [{ translateY }]
-        }}>
-            {children}
-        </Animated.View>
-    );
-};
-
-// CategoryBadge Component
-const CategoryBadge = ({ category }) => {
-    const getBadgeColor = () => {
-        switch (category.toLowerCase()) {
-            case 'announcement':
-                return styles.announcementBadge;
-            case 'alert':
-                return styles.alertBadge;
-            default:
-                return styles.defaultBadge;
-        }
-    };
-
-    return (
-        <View style={[styles.categoryBadge, getBadgeColor()]}>
-            <Text style={styles.categoryText}>{category}</Text>
-        </View>
-    );
-};
-
-// NewsCard Component
-const NewsCard = ({ item, onPress, index }) => {
-    return (
-        <FadeInView delay={index * 100}>
-            <TouchableOpacity
-                onPress={() => onPress(item)}
-                style={styles.newsCard}
-                activeOpacity={0.7}
-            >
-                <View style={styles.newsCardHeader}>
-                    <CategoryBadge category={item.category} />
-                    <View style={styles.dateContainer}>
-                        <Clock size={14} color="#666" style={{ marginRight: 4 }} />
-                        <Text style={styles.dateText}>
-                            {new Date(item.publishDate).toLocaleDateString()}
-                        </Text>
-                    </View>
-                </View>
-
-                <Text style={styles.newsTitle}>{item.title}</Text>
-                <Text style={styles.newsContent} numberOfLines={3}>
-                    {item.content}
-                </Text>
-
-                <View style={styles.tagsContainer}>
-                    {item.tags.map((tag, index) => (
-                        <View key={index} style={styles.tagChip}>
-                            <Tag size={12} color="#666" style={{ marginRight: 4 }} />
-                            <Text style={styles.tagText}>#{tag}</Text>
-                        </View>
-                    ))}
-                </View>
-
-                <View style={styles.newsCardFooter}>
-                    <View style={styles.authorContainer}>
-                        <View style={styles.authorAvatar}>
-                            <Text style={styles.authorInitials}>
-                                {item.author.split(' ').map(n => n[0]).join('')}
-                            </Text>
-                        </View>
-                        <Text style={styles.authorText}>
-                            {item.author}
-                        </Text>
-                    </View>
-                    <ChevronRight size={20} color="#2196F3" />
-                </View>
-            </TouchableOpacity>
-        </FadeInView>
-    );
-};
-
-// FilterBar Component
-const FilterBar = ({ onFilterChange }) => {
-    const [activeFilter, setActiveFilter] = useState('all');
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-        }).start();
-    }, []);
-
-    const filters = [
-        { id: 'all', label: 'All News', icon: BookOpen },
-        { id: 'announcements', label: 'Announcements', icon: Bell },
-        { id: 'alerts', label: 'Alerts', icon: Filter },
-    ];
-
-    return (
-        <Animated.View style={[styles.filterBarContainer, { opacity: fadeAnim }]}>
-            <FlatList
-                horizontal
-                data={filters}
-                keyExtractor={item => item.id}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item }) => {
-                    const Icon = item.icon;
-                    const isActive = activeFilter === item.id;
-                    return (
-                        <TouchableOpacity
-                            onPress={() => {
-                                setActiveFilter(item.id);
-                                onFilterChange(item.id);
-                            }}
-                            style={[
-                                styles.filterButton,
-                                isActive && styles.filterButtonActive
-                            ]}
-                        >
-                            <Icon
-                                size={16}
-                                color={isActive ? 'white' : '#666'}
-                                style={styles.filterIcon}
-                            />
-                            <Text style={[
-                                styles.filterText,
-                                isActive && styles.filterTextActive
-                            ]}>
-                                {item.label}
-                            </Text>
-                        </TouchableOpacity>
-                    );
-                }}
-                contentContainerStyle={styles.filterList}
-            />
-        </Animated.View>
-    );
-};
+import FilterBar from '../Components/FilterBar';
+import NewsCard from '../Components/NewsCard';
+import FadeInView2 from '../Components/FadeInView2';
 
 // Main StudentNewsScreen Component
 const StudentNewsScreen = () => {
@@ -298,7 +129,7 @@ const StudentNewsScreen = () => {
             />
 
             <View style={[styles.contentContainer, { paddingTop: insets.top }]}>
-                <FadeInView>
+                <FadeInView2>
                     <View style={styles.searchContainer}>
                         <Search size={20} color="#666" style={styles.searchIcon} />
                         <TextInput
@@ -343,13 +174,13 @@ const StudentNewsScreen = () => {
                             )}
                         />
                     )}
-                </FadeInView>
+                </FadeInView2>
             </View>
         </View>
     );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8F9FA',
